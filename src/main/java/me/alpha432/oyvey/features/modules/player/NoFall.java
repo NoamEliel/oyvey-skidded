@@ -4,10 +4,10 @@ import me.alpha432.oyvey.features.modules.Module;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
-public class PhaseThroughBlocks extends Module {
+public class NoFall extends Module { // must match file name
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public PhaseThroughBlocks() {
+    public NoFall() {
         super("PhaseThroughBlocks", "Walk through walls but stay grounded", Category.PLAYER, true, false, false);
     }
 

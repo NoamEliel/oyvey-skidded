@@ -3,39 +3,45 @@ package me.alpha432.oyvey.features.modules.player;
 import me.alpha432.oyvey.features.modules.Module;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.BlockState;
 
-public class NoFall extends Module {
+public class PhaseThroughBlocks extends Module {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public NoFall() {
-        super("PhaseThroughBlocks", "Walk through walls, pistons, etc., but still stand on the floor", Category.PLAYER, true, false, false);
+    public PhaseThroughBlocks() {
+        super("PhaseThroughBlocks", "Walk through walls but stay grounded", Category.PLAYER, true, false, false);
+    }
+
+    @Override
+    public void onEnable() {
+        if (mc.player != null) {
+            mc.player.noClip = true; // disable block collisions
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (mc.player != null) {
+            mc.player.noClip = false; // restore collisions
+        }
     }
 
     @Override
     public void onUpdate() {
-        if (mc.player == null || mc.world == null) {
-            return;
-        }
+        if (mc.player == null) return;
 
-        // Check the block under the player
-        BlockPos floorPos = mc.player.getBlockPos().down();
-        BlockState floorState = mc.world.getBlockState(floorPos);
+        // Allow free movement through blocks
+        mc.player.noClip = true;
+        mc.player.setVelocity(0, 0, 0);
 
-        // We only care about the floor - everything else is ignored
-        boolean onFloor = !floorState.isAir();
-
-        // Send movement packet to keep server in sync
-        PlayerMoveC2SPacket.Full packet = new PlayerMoveC2SPacket.Full(
+        // Spoof a movement packet every tick so the server "accepts" our position
+        mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),
                 mc.player.getZ(),
                 mc.player.getYaw(),
                 mc.player.getPitch(),
-                onFloor, // Pretend we're only "on ground" if standing on a floor
-                mc.player.horizontalCollision
-        );
-        mc.player.networkHandler.sendPacket(packet);
+                true, // pretend we're on ground
+                false
+        ));
     }
 }

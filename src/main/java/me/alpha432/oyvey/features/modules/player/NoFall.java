@@ -6,10 +6,10 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.BlockState;
 
-public class PhaseThroughBlocks extends Module {
+public class NoFall extends Module {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public PhaseThroughBlocks() {
+    public NoFall() {
         super("PhaseThroughBlocks", "Walk through walls, pistons, etc., but still stand on the floor", Category.PLAYER, true, false, false);
     }
 
@@ -19,24 +19,21 @@ public class PhaseThroughBlocks extends Module {
             return;
         }
 
-        // Get the block directly under the player
+        // Check the block under the player
         BlockPos floorPos = mc.player.getBlockPos().down();
         BlockState floorState = mc.world.getBlockState(floorPos);
 
-        // Ensure we only interact with the floor normally
-        if (!floorState.isAir()) {
-            mc.player.onGround = true;
-        }
+        // We only care about the floor - everything else is ignored
+        boolean onFloor = !floorState.isAir();
 
-        // Phase through all other blocks
-        // By sending a movement packet each tick to "legitimize" our position
+        // Send movement packet to keep server in sync
         PlayerMoveC2SPacket.Full packet = new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),
                 mc.player.getZ(),
                 mc.player.getYaw(),
                 mc.player.getPitch(),
-                mc.player.isOnGround(),
+                onFloor, // Pretend we're only "on ground" if standing on a floor
                 mc.player.horizontalCollision
         );
         mc.player.networkHandler.sendPacket(packet);

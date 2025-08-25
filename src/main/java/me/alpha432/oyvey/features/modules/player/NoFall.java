@@ -14,7 +14,7 @@ public class NoFall extends Module {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public NoFall() {
-        super("AnkleInsurance", "Turns terminal velocity into a light inconvenience", Category.PLAYER, true, false, false);
+        super("NoPistonPush", "LEL", Category.PLAYER, true, false, false);
     }
 
     @Override

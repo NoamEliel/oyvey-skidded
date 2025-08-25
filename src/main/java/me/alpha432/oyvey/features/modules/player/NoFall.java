@@ -36,7 +36,6 @@ public class NoFall extends Module { // must match file name
         // Keep normal floor behavior
         BlockPos floorPos = mc.player.getBlockPos().down();
         boolean onSolidFloor = !mc.world.getBlockState(floorPos).isAir();
-        mc.player.onGround = onSolidFloor;
 
         // Spoof movement packet so the server/client accepts position
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(
